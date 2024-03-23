@@ -1,4 +1,6 @@
 from flask import Flask,render_template
+import json
+import requests
 import random
 import string
 
@@ -8,6 +10,7 @@ def sifreolusturma(length=12):
     karakterler = string.ascii_letters + string.digits + string.punctuation
     şifre = ''.join(random.choice(karakterler) for _ in range(length))
     return şifre 
+
 
 @app.route("/")
 def hello_world():
@@ -47,6 +50,21 @@ def yazitura():
 def sifre():
     return f"<h1> İşte şifreniz! </h1> {sifreolusturma(12)}"        
 
+def resimsecme():
+    url = 'https://random-d.uk/api/random'
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Buraya internetten baktım ama yani biraz çözdüm öyle tam anlayabilmiş değilim
+        data = response.json()
+        return data['url']
+    except requests.RequestException as e:
+        print("Error fetching image URL:", e)
+        return None
+
+@app.route("/resim", methods=["GET"])
+def resim():
+    resimurl = resimsecme()
+    return f"<img src='{resimurl}' alt='Ördek Resmi'>"
 
 
 if __name__ == "__main__":
